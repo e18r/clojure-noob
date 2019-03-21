@@ -171,3 +171,83 @@
     (reduce adder [] asym-body-parts)))
 
 (add-body-parts asym-hobbit-body-parts 3)
+
+(fn [seq nth]
+  (loop [head (first seq)
+         tail (rest seq)
+         index 0]
+    (if (= index nth)
+      head
+      (recur (first tail)
+             (rest tail)
+             (inc index)))))
+
+(= (enth '(4 5 6 7) 2) 6)
+(= (enth [:a :b :c] 0) :a)
+(= (enth [1 2 3 4] 1) 2)
+(= (enth '([1 2] [3 4] [5 6]) 2) [5 6])
+
+(map inc [1 2 3 4])
+
+(reduce str {:a 1 :b 2)}
+
+(str {:a 1 :b 2})
+
+(first #{:a :b})
+
+(#(str %1 %2) "aou" "eee")
+
+(map #(str (second %)) {:a 1})
+
+(seq '(1 2 3))
+(seq [1 2 3])
+(seq #{1 2 3})
+(seq {:name "Emi" :occupation "dev"})
+(into {} (seq {:a 1 :b 2 :c 3}))
+
+(map str ["a" "b" "c"])
+(map str ["a" "b" "c"] ["A" "B" "C"])
+
+(def human-consumption   [8.1 7.3 6.6 5.0])
+(def critter-consumption [0.0 0.2 0.3 1.1])
+(defn unify-diet-data
+  [human critter]
+  {:human human
+   :critter critter})
+(map unify-diet-data human-consumption critter-consumption)
+
+
+(def sum #(reduce + %))
+(def avg #(/ (sum %) (count %)))
+(defn stats [numbers]
+  (map #(% numbers) [sum count avg]))
+(stats [3 4 10])
+(stats [80 1 44 13 6])
+
+(def identities
+  [{:alias "Batman" :real "Bruce Wayne"}
+   {:alias "Spider-Man" :real "Peter Parker"}
+   {:alias "Santa" :real "Your mom"}
+   {:alias "Easter Bunny" :real "Your dad"}])
+(map :real identities)
+
+(reduce (fn [new-map [key val]]
+          (assoc new-map key (inc val)))
+        {} {:max 30 :min 10})
+
+(reduce (fn [new-map [key val]]
+          (if (> val 4)
+            (assoc new-map key val)
+            new-map))
+        {} {:human 4.1 :critter 3.9})
+
+(defn mapea
+  [f seq]
+  (reduce (fn [new-seq elem]
+            (conj new-seq
+                  (f elem)))
+          []
+          seq))
+
+(map inc [1 2 3])
+(mapea inc [1 2 3])
