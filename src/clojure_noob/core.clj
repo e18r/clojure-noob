@@ -251,3 +251,196 @@
 
 (map inc [1 2 3])
 (mapea inc [1 2 3])
+
+
+
+
+
+(take 3 [1 2 3 4 5 6])
+(drop 3 [1 2 3 4 5 6])
+
+(def food-journal
+  [{:month 1 :day 1 :human 5.3 :critter 2.3}
+   {:month 1 :day 2 :human 5.1 :critter 2.0}
+   {:month 2 :day 1 :human 4.9 :critter 2.1}
+   {:month 2 :day 2 :human 5.0 :critter 2.5}
+   {:month 3 :day 1 :human 4.2 :critter 3.3}
+   {:month 3 :day 2 :human 4.0 :critter 3.8}
+   {:month 4 :day 1 :human 3.7 :critter 3.9}
+   {:month 4 :day 2 :human 3.7 :critter 3.6}])
+
+(take-while #(>= (% :month) 3) food-journal)
+(drop-while #(>= (% :month) 3) food-journal)
+(take-while #(< (% :month) 4)
+            (drop-while #(< (% :month) 2) food-journal))
+
+
+
+(defn filtra
+  "Filter implementation without reduce"
+  [f seq]
+  (loop [head (first seq)
+         tail (rest seq)
+         result []]
+    (if (nil? head)
+      result
+      (if (f head)
+        (recur (first tail)
+               (rest tail)
+               (conj result
+                     head))
+        (recur (first tail)
+               (rest tail)
+               result)))))
+
+(defn filtra
+  "Filter implementation with reduce"
+  [f seq]
+  (reduce (fn [result element]
+            (if (f element)
+              (conj result element)
+              result
+              ))
+          []
+          seq))
+
+(= (filter #(< (% :human) 5) food-journal) (filtra #(< (% :human) 5) food-journal))
+(= (filter #(and (> (% :month) 1) (< (% :month) 4)) food-journal) (filtra #(and (> (% :month) 1) (< (% :month) 4)) food-journal))
+
+(defn soma
+  "implementation of some"
+  [f seq]
+  (loop [head (first seq)
+         tail (rest seq)]
+    (if (nil? head)
+      nil
+      (let [result (f head)]
+        (if result
+          result
+          (recur (first tail)
+                 (rest tail)))))))
+
+(soma #(> (% :critter) 5) food-journal)
+(soma #(> (% :critter) 3) food-journal)
+(soma #(and (> (% :critter) 3) %) food-journal)
+
+(sort [2 5 1 8])
+
+(sort-by count [[2 3 4 5] [1 1] [:a]])
+
+(concat [:a] [1 2 3])
+
+(def vampire-database
+  {0 {:makes-blood-puns? false, :has-pulse? true  :name "McFishwich"}
+   1 {:makes-blood-puns? false, :has-pulse? true  :name "McMackson"}
+   2 {:makes-blood-puns? true,  :has-pulse? false :name "Damon Salvatore"}
+   3 {:makes-boold-puns? true,  :has-pulse? true  :name "Mickey Mouse"}})
+
+vampire-database
+
+(defn vampire-related-details
+  [social-security-number]
+  (Thread/sleep 1000)
+  (get vampire-database social-security-number))
+
+(defn vampire?
+  [record]
+  (and (:makes-blood-puns? record)
+       (not (:has-pulse? record))
+       record))
+
+(defn identify-vampire
+  [social-security-numbers]
+  (first (filter vampire?
+                 (map vampire-related-details social-security-numbers))))
+
+(time (vampire-related-details 0))
+
+(time (def mapped-details (map vampire-related-details (range 0 1000000))))
+
+(time (first mapped-details))
+
+(time (identify-vampire (range 0 1000000)))
+
+(take 44 (repeat :a))
+
+(take 3 (repeatedly #(rand)))
+
+(defn even-numbers
+  ([] (even-numbers 0))
+  ([n] (if (= n 0)
+         [n]
+         (conj (even-numbers (- n 2)) n))))
+
+(defn even-numbers
+  ([] (even-numbers [] 0))
+  ([seq n]
+   (conj seq (even-numbers seq (+ n 2)))))
+
+(cons 5 (cons 2 nil))
+
+(defn even-numbers
+  ([] (even-numbers 0))
+  ([n] (cons n (lazy-seq (even-numbers (+ n 2))))))
+
+(take 8 (even-numbers))
+
+(seq [1 2 3])
+(lazy-seq [1 2 3])
+
+(conj {:time "midnight"} [:place])
+
+(into [0] [1 2 3 4 5])
+(conj [0] 1 2 3 4 5)
+(conj [0] [1 2 3 4 5])
+(apply conj [0] [1 2 3 4 5])
+(max 2 5 9)
+(max [2 5 9])
+(apply max [2 5 9])
+
+(defn my-into
+  [target seq]
+  (apply conj target seq))
+
+(my-into [0] [1 2 3 4 5])
+
+((partial max 1 2 3) 2)
+
+(def add10 (partial + 10))
+(add10 3)
+
+(def add-missing-elements
+  (partial conj ["water" "earth" "air"]))
+
+(add-missing-elements "adamantium")
+
+(defn lousy-logger
+  [log-level message]
+  (condp = log-level
+    :warn (clojure.string/lower-case message)
+    :emergency (clojure.string/upper-case message)))
+
+(def warn (partial lousy-logger :warn))
+
+(warn "Red light ahead")
+
+(doc condp)
+
+(defn identify-humans
+  [social-security-numbers]
+  (filter #(not (vampire? %))
+          (map vampire-related-details social-security-numbers)))
+
+(def not-vampire? (complement vampire?))
+
+(defn identify-humans
+  [social-security-numbers]
+  (filter not-vampire?
+          (map vampire-related-details social-security-numbers)))
+
+(identify-humans (range 1 1000000)) ; don't execute!
+
+(defn my-complement
+  [f]
+  (fn [& args]
+    (not (apply f args))))
