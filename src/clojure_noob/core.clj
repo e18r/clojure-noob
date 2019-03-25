@@ -444,3 +444,13 @@ vampire-database
   [f]
   (fn [& args]
     (not (apply f args))))
+
+(defn suma
+  ([values]
+   (suma values 0))
+  ([values acc]
+   (if (empty? values)
+     acc
+     (recur (rest values) (+ (first values) acc)))))
+
+(suma [1 2 3 4])
